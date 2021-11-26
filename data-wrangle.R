@@ -1,4 +1,7 @@
-# Load Packages
+############
+# Packages #
+############
+
 library(tidyverse)
 library(kableExtra)
 library(robotstxt) 
@@ -7,6 +10,11 @@ library(purrr)
 library(janitor)
 library(tidytext)
 library(readr)
+
+
+############################################
+# Data Import and Large Data Set wrangling #
+############################################
 
 # First checking if data is allowed to be scraped from website: http://insideairbnb.com/get-the-data.html
 paths_allowed("http://insideairbnb.com/get-the-data.html")
@@ -154,5 +162,30 @@ all_properties <- all_properties %>%
 
 # Write a csv of the all_properties dataset.
 write_csv(all_properties, "airbnb_master.csv")
+
+
+###################################
+# Data Set Creation for Host Data #
+###################################
+
+# Select Host related variables only
+host_data <- all_properties %>%
+  select(host_id,
+         host_since,
+         host_listings_count_total,
+         host_listings_count_entire_homes,
+         host_listings_count_private_rooms,
+         host_listings_count_shared_rooms,
+         locale,
+         month_host_joined,
+         host_response_proportion,
+         host_acceptance_proportion)
+
+# Get rid of duplicate hosts since rows are identified by properties currently
+host_data <- host_data[!duplicated(host_data$host_id), ]
+
+# Write a csv for host_data 
+write_csv(host_data, "host_master.csv")
+
 
 
