@@ -1,16 +1,22 @@
 ---
-title: "Identifying Airbnb Trends Across the United States"
+title: "Identifying Airbnb Trends Across the US"
 author: "Louis Kim"
 date: "11/26/2021"
 output:
-  rmdformats::readthedown:
+  rmdformats::material:
     thumbnails: false
     highlight: "kate"
 ---
 
 ```{r setup, include = FALSE}
 library(tidyverse)
-library(kableExtra) # for example code; delete if not needed
+library(kableExtra)
+library(robotstxt) 
+library(rvest) 
+library(purrr)
+library(janitor)
+library(tidytext)
+library(readr)
 
 # Set code chunk defaults 
 knitr::opts_chunk$set(echo = FALSE, 
@@ -21,6 +27,16 @@ knitr::opts_chunk$set(echo = FALSE,
 # Set R environment options
 options(knitr.kable.NA = '')
 ```
+
+# Introduction
+
+# The Data
+
+# Analysis
+
+## Airbnb Housing Trends
+## Airbnb Host Trends
+
 
 # Header 1 (Section heading)
 
