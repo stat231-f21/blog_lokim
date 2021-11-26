@@ -1,7 +1,7 @@
 ---
-title: "Your Project Title Here"
-author: "Your Names Here"
-date: "Add a date"
+title: "Identifying Airbnb Trends Across the United States"
+author: "Louis Kim"
+date: "11/26/2021"
 output:
   rmdformats::readthedown:
     thumbnails: false
