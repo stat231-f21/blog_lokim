@@ -1,0 +1,59 @@
+---
+title: "Figures"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(robotstxt)
+library(ggplot2)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r import-data}
+all_listings <- read_csv("airbnb_master.csv")
+all_hosts <- read_csv("host_master.csv")
+```
+
+
+```{r violin plot of prices grouped by locale}
+#Grab Data only needed for violin plot
+violin_data <- all_listings %>%
+  select(price_per_night, locale)
+  
+#Convert locale variable to factor variable
+violin_data$locale <- as.factor(violin_data$locale)
+
+#Get rid of outliers
+Q1 <- quantile(violin_data$price_per_night, .25)
+Q3 <- quantile(violin_data$price_per_night, .75)
+IQR <- IQR(violin_data$price_per_night)
+
+no_outliers <- subset(violin_data, violin_data$price_per_night > (Q1 - 1.5*IQR) & violin_data$price_per_night < (Q3 + 1.5*IQR))
+
+#Create the violin plot
+violin_plot <- ggplot(no_outliers, aes(x=locale, y=price_per_night, fill=locale)) + 
+  geom_violin(trim=FALSE) +
+  geom_boxplot(width=0.1, fill="white") + 
+  labs(title="Pricing Distribution across Locales",x="Locale", y = "Price per Night")
+  
+#Print plot
+violin_plot
+```
+
+```{r hosts-joining plot}
+#Pull variables
+host_join_data <- all_hosts %>%
+  select(host_since, month_host_joined)
+
+#Create Plot
+
+
+#Print Plot
+
+```
+
+
+
