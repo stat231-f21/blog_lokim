@@ -24,6 +24,7 @@ austin <- read_csv("airbnb_raw_data/Austin.csv")
 boston <- read_csv("airbnb_raw_data/Boston.csv")
 chicago <- read_csv("airbnb_raw_data/Chicago.csv")
 denver <- read_csv("airbnb_raw_data/Denver.csv")
+hawaii <- read_csv("airbnb_raw_data/Hawaii.csv")
 losangeles <- read_csv("airbnb_raw_data/LosAngeles.csv")
 nashville <- read_csv("airbnb_raw_data/Nashville.csv")
 neworleans <- read_csv("airbnb_raw_data/NewOrleans.csv")
@@ -45,6 +46,9 @@ chicago <- chicago %>%
   select(-neighbourhood_cleansed, -neighbourhood_group_cleansed, - neighbourhood, -neighborhood_overview)
 denver <- denver %>%
   mutate(locale = "Denver") %>%
+  select(-neighbourhood_cleansed, -neighbourhood_group_cleansed, - neighbourhood, -neighborhood_overview)
+hawaii <- hawaii %>%
+  mutate(locale = "Hawaii") %>%
   select(-neighbourhood_cleansed, -neighbourhood_group_cleansed, - neighbourhood, -neighborhood_overview)
 losangeles <- losangeles %>%
   mutate(locale = "Los Angeles") %>%
@@ -73,6 +77,7 @@ all_properties = rbind(austin,
                        boston,
                        chicago,
                        denver,
+                       hawaii,
                        losangeles,
                        nashville,
                        neworleans,
