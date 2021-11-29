@@ -1,0 +1,51 @@
+---
+title: "Hosts Plots"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(robotstxt)
+library(ggplot2)
+library(ggmap)
+library(RColorBrewer)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r import-data}
+all_listings <- read_csv("airbnb_master.csv")
+all_hosts <- read_csv("host_master.csv")
+```
+
+```{r scatter acceptance_rate vs response_rate}
+#Pull needed vars
+hosts_scatter1 <- all_hosts %>%
+  select(host_id,
+         host_response_proportion,
+         host_acceptance_proportion,
+         locale,
+         host_listings_count_total)
+
+#Create plot object
+scatter_plot1 <- ggplot(hosts_scatter1, aes(x=host_response_proportion, y=host_acceptance_proportion)) +
+  geom_point()
+
+scatter_plot1
+```
+
+
+```{r scatter listings_count vs acceptance_rate }
+```
+
+
+```{r host_since plot. Date vs join count}
+```
+
+
+```{r bar graph monthly counts}
+```
+
+
