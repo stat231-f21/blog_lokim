@@ -36,19 +36,18 @@ IQR <- IQR(violin_data$price_per_night)
 
 no_outliers <- subset(violin_data, violin_data$price_per_night > (Q1 - 1.5*IQR) & violin_data$price_per_night < (Q3 + 1.5*IQR))
 
+#Reorder locales by median price
+no_outliers %>%
+  mutate(locale = fct_reorder(locale, price_per_night, .fun="median"))
+
 #Create the violin plot
-violin_plot <- ggplot(no_outliers, aes(x=locale, y=price_per_night, fill=locale)) + 
+violin_plot <- ggplot(no_outliers, aes(x=reorder(locale, price_per_night), y=price_per_night, fill=locale)) + 
   geom_violin(trim=FALSE) +
   geom_boxplot(width=0.1, fill="white") + 
   labs(title="Pricing Distribution across Locales",x="Locale", y = "Price per Night")
   
 #Print plot
 violin_plot
-
-#Create another violin plot by locale region instead
-region_data <- violin_data %>%
-  mutate(region = )
-
 ```
 
 

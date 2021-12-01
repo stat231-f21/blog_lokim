@@ -11,41 +11,86 @@ library(robotstxt)
 library(ggplot2)
 library(ggmap)
 library(RColorBrewer)
+library(car)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
 ```{r import-data}
+# Read in full data sets
 all_listings <- read_csv("airbnb_master.csv")
 all_hosts <- read_csv("host_master.csv")
 ```
 
-```{r scatter acceptance_rate vs response_rate}
-#Pull needed vars
-hosts_scatter1 <- all_hosts %>%
-  select(host_id,
-         host_response_proportion,
-         host_acceptance_proportion,
-         locale,
-         host_listings_count_total)
-
-#Create plot object
-scatter_plot1 <- ggplot(hosts_scatter1, aes(x=host_response_proportion, y=host_acceptance_proportion)) +
-  geom_point()
-
-scatter_plot1
-```
-
-
-```{r scatter listings_count vs acceptance_rate }
-```
-
 
 ```{r host_since plot. Date vs join count}
+
 ```
 
 
 ```{r bar graph monthly counts}
+# Create data frame with counts of hosts joining each month
+month_counts <- data.frame(table(all_hosts$month_host_joined))
+
+# Create bar chart object
+month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
+  geom_col()
+
+# Print bar chart
+month_bar
 ```
+
+
+```{r scatter acceptance_rate vs response_rate}
+# Pull needed vars
+hosts_scatter <- all_hosts %>%
+  select(id_host,
+         host_response_proportion,
+         host_acceptance_proportion,
+         locale,
+         host_listings_count_total) 
+
+# Create plot object
+acc_res_scatter <- ggplot(hosts_scatter, aes(x=host_response_proportion, y=host_acceptance_proportion)) +
+  geom_hex(bins = 20,alpha = 0.9) + 
+  scale_fill_gradient2(low="yellow",high="red")
+
+# Print Object
+acc_res_scatter
+```
+
+
+```{r scatter acceptance_rate vs listings_count}
+# Prep data frame: convert id_host to factor var
+hosts_scatter_b <- hosts_scatter %>%
+  mutate(host_id = as.factor(id_host))
+  filter(hosts_scatter, host_listings_count_total > 10)
+
+# Create plot object
+acc_listings_scatter <- ggplot(hosts_scatter_b, aes(x=host_listings_count_total, y=host_acceptance_proportion)) +
+  geom_point(color = "red", alpha = 0.2) 
+
+# Print Scatterplot
+acc_listings_scatter
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

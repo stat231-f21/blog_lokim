@@ -10,6 +10,7 @@ library(purrr)
 library(janitor)
 library(tidytext)
 library(readr)
+library(dplyr)
 
 
 ############################################
@@ -114,13 +115,11 @@ all_properties <- all_properties %>%
             "minimum_nights_avg_ntm",
             "maximum_nights_avg_ntm",
             "calendar_updated",
-            "has_availability",
             "availability_30",
             "availability_60",
             "availability_90",
             "availability_365",
             "calendar_last_scraped",
-            "first_review",
             "last_review",
             "review_scores_accuracy",
             "review_scores_communication",
@@ -185,6 +184,17 @@ host_data <- all_properties %>%
          month_host_joined,
          host_response_proportion,
          host_acceptance_proportion)
+
+#Convert host_id to chr
+host_data <- host_data %>%
+  mutate(id_host = as.character(host_id)) %>%
+  select(-host_id)
+
+# Mutate response proportion and acceptance proportion to get a single average for each unique host
+host_data <- host_data %>%
+  transform(average_acceptance = ave(host_acceptance_proportion, id_host, FUN = mean)) %>%
+  transform(average_response = ave(host_response_proportion, id_host, FUN = mean))
+  
 
 # Get rid of duplicate hosts since rows are identified by properties currently
 host_data <- host_data[!duplicated(host_data$host_id), ]

@@ -1,28 +1,115 @@
 ---
-title: "wordcloud"
+title: "Word Cloud Plots"
 output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(robotstxt)
+library(ggplot2)
+library(ggmap)
+library(RColorBrewer)
+library(car)
+library(tm)
+library(wordcloud)
+library(wordcloud2)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
+```{r import-data}
+all_listings <- read_csv("airbnb_master.csv")
+all_hosts <- read_csv("host_master.csv")
 ```
 
-## Including Plots
 
-You can also embed plots, for example:
+```{r wordcloud listing_description} 
+#https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
+#prep data frame
+listing_desc <- all_listings %>%
+  select(listing_description)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+listing_desc <- sample_n(listing_desc, 1000)
+
+listing_desc
+
+#create corpus
+corp <- Corpus(VectorSource(listing_desc))
+
+
+#clean corpus
+corp <- corp %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(stripWhitespace)
+corp <- tm_map(corp, content_transformer(tolower))
+corp <- tm_map(corp, removeWords, stopwords("english"))
+
+#create doccument matrix for wordcloud
+dtm <- TermDocumentMatrix(corp)
+matrix <- as.matrix(dtm)
+words <- sort(rowSums(matrix),decreasing=TRUE)
+df <- data.frame(word = names(words),freq=words)
+
+#set wordcloud seed for consistency
+set.seed(53)
+
+#create wordcloud
+wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words=70, random.order=FALSE, rot.per=0.3,            colors=brewer.pal(8, "Dark2"))
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r wordcloud} 
+#https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
+#prep data frame
+listing_name <- all_listings %>%
+  select(listing_name)
+
+listing_name <- sample_n(listing_name, 1000)
+
+listing_name
+
+#create corpus
+corp_name <- Corpus(VectorSource(listing_name))
+
+
+#clean corpus
+corp_name <- corp_name %>%
+  tm_map(removeNumbers) %>%
+  tm_map(removePunctuation) %>%
+  tm_map(stripWhitespace)
+corp_name <- tm_map(corp_name, content_transformer(tolower))
+corp_name <- tm_map(corp_name, removeWords, stopwords("english"))
+
+#create doccument matrix for wordcloud
+dtm_name <- TermDocumentMatrix(corp_name)
+matrix_name <- as.matrix(dtm_name)
+words_name <- sort(rowSums(matrix_name),decreasing=TRUE)
+df_name <- data.frame(word = names(words_name),freq=words_name)
+
+#set wordcloud seed for consistency
+set.seed(53)
+
+#create wordcloud
+wordcloud(words = df_name$word, freq = df_name$freq, min.freq = 1, max.words=70, random.order=FALSE, rot.per=0.3,            colors=brewer.pal(8, "Dark2"))
+```
+
+
+```{r word frequency barchart}
+#data <- data[with(data,order(-Score)),]
+
+#data <- data[1:10,]
+```
+
+
+
+
+
+
+
+
+
+
+
