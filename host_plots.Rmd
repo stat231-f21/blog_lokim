@@ -12,6 +12,7 @@ library(ggplot2)
 library(ggmap)
 library(RColorBrewer)
 library(car)
+library(scales)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -63,7 +64,7 @@ month_counts <- data.frame(table(all_hosts$month_host_joined))
 
 # Create bar chart object
 month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
-  geom_col()
+  geom_col() 
 
 # Print bar chart
 month_bar
@@ -83,7 +84,7 @@ joined_summary <- data.frame(table(joined_since$host_since))
 
 # Create plot 
 host_since_plot <- ggplot(joined_summary, aes(x = as.numeric(Var1), y = Freq)) + 
-  geom_line(col = "red")
+  geom_line(col = "red") 
 
 # Print plot
 host_since_plot

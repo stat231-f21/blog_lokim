@@ -60,7 +60,17 @@ wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words=70, random.or
 ```
 
 ```{r Description Barchart}
+# Wrangling for bar chart frequency plot
+desc_freq <- df[order(-df$freq),] %>%
+  top_n(10)
 
+# Create plot object
+desc_bar <- ggplot(data = desc_freq, aes(x=reorder(word, freq), y=freq, fill = word)) +
+  geom_col() +
+  coord_flip()
+
+# Print plot
+desc_bar
 ```
 
 
@@ -101,9 +111,17 @@ wordcloud(words = df_name$word, freq = df_name$freq, min.freq = 1, max.words=70,
 
 
 ```{r Name Barchart}
-#data <- data[with(data,order(-Score)),]
+# Wrangling for bar chart frequency plot
+name_freq <- df_name[order(-df_name$freq),] %>%
+  top_n(10)
 
-#data <- data[1:10,]
+# Create plot object
+name_bar <- ggplot(data = name_freq, aes(x=reorder(word, freq), y=freq, fill = word)) +
+  geom_col() +
+  coord_flip()
+
+# Print plot
+name_bar
 ```
 
 
