@@ -75,15 +75,17 @@ roomtype_counts <- all_listings %>%
 
 # Filter by locale
 roomtype_counts <- roomtype_counts %>%
-  filter(locale == "Hawaii")
+  filter(locale == "Boston")
 
 # Count frequency by room type
 roomtype_counts <- data.frame(table(roomtype_counts$room_type))
 
 # Create Tree map
 roomtype_map <- treemap(roomtype_counts,
-                        index = c("Var1"),
-                        vSize = "Freq", type = "index")
+                        index = "Var1",
+                        vSize = "Freq", 
+                        type = "index",
+                        palette = "Set2")
 
 # Print Tree map
 roomtype_map

@@ -19,6 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Read in full data sets
 all_listings <- read_csv("airbnb_master.csv")
 all_hosts <- read_csv("host_master.csv")
+index_housing <- read_csv("housing_index.csv")
 ```
 
 
@@ -69,12 +70,57 @@ month_bar
 ```
 
 
-```{r host_since plot. Date vs join count}
+```{r host_since plot monthly Seasonality}
+# Pull Vars
+joined_since <- all_hosts %>%
+  select(host_since, id_host)
 
+# Reformat date joined to mmyy format
+joined_since$host_since <- format(joined_since$host_since,"%m/%Y")
+
+# Summarize counts
+joined_summary <- data.frame(table(joined_since$host_since))
+
+# Create plot 
+host_since_plot <- ggplot(joined_summary, aes(x = as.numeric(Var1), y = Freq)) + 
+  geom_line(col = "red")
+
+# Print plot
+host_since_plot
 ```
 
 
+```{r host_since plot. Date vs join count}
+# Pull vars
+year_joined <- all_hosts %>%
+  select(host_since, id_host)
 
+# Reformat to just year
+year_joined$host_since <- format(year_joined$host_since,"%Y")
+
+# Count joiners for each year
+year_summary <- data.frame(table(year_joined$host_since)) %>%
+  rename("year" = Var1)
+
+# Prep housing index data
+index <- index_housing %>%
+  mutate(year = as.factor(date))
+
+combined <- merge(year_summary, index, by ="year") %>%
+  select(-date)
+
+coeff <- max(combined$value)/max(combined$Freq)
+
+host_since_plot <- ggplot(combined, aes(x = as.numeric(year))) + 
+  geom_line(aes(y = Freq), col = "red") + 
+  geom_line(aes(y = value / coeff),col = "blue") + 
+  scale_y_continuous(
+    name = "Number of people joined",
+    sec.axis = sec_axis(~.*coeff, name = "Housing Index $") 
+  )
+
+host_since_plot
+```
 
 
 
