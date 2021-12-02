@@ -15,7 +15,6 @@ library(car)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ```{r import-data}
 # Read in full data sets
 all_listings <- read_csv("airbnb_master.csv")
@@ -23,21 +22,18 @@ all_hosts <- read_csv("host_master.csv")
 ```
 
 
-```{r host_since plot. Date vs join count}
+```{r scatter acceptance_rate vs listings_count}
+# Prep data frame: convert id_host to factor var
+hosts_scatter_b <- hosts_scatter %>%
+  mutate(host_id = as.factor(id_host))
+  filter(hosts_scatter, host_listings_count_total > 10)
 
-```
+# Create plot object
+acc_listings_scatter <- ggplot(hosts_scatter_b, aes(x=host_listings_count_total, y=host_acceptance_proportion)) +
+  geom_point(color = "red", alpha = 0.2) 
 
-
-```{r bar graph monthly counts}
-# Create data frame with counts of hosts joining each month
-month_counts <- data.frame(table(all_hosts$month_host_joined))
-
-# Create bar chart object
-month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
-  geom_col()
-
-# Print bar chart
-month_bar
+# Print Scatterplot
+acc_listings_scatter
 ```
 
 
@@ -60,19 +56,31 @@ acc_res_scatter
 ```
 
 
-```{r scatter acceptance_rate vs listings_count}
-# Prep data frame: convert id_host to factor var
-hosts_scatter_b <- hosts_scatter %>%
-  mutate(host_id = as.factor(id_host))
-  filter(hosts_scatter, host_listings_count_total > 10)
+```{r bar graph monthly counts}
+# Create data frame with counts of hosts joining each month
+month_counts <- data.frame(table(all_hosts$month_host_joined))
 
-# Create plot object
-acc_listings_scatter <- ggplot(hosts_scatter_b, aes(x=host_listings_count_total, y=host_acceptance_proportion)) +
-  geom_point(color = "red", alpha = 0.2) 
+# Create bar chart object
+month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
+  geom_col()
 
-# Print Scatterplot
-acc_listings_scatter
+# Print bar chart
+month_bar
 ```
+
+
+```{r host_since plot. Date vs join count}
+
+```
+
+
+
+
+
+
+
+
+
 
 
 

@@ -11,9 +11,9 @@ library(robotstxt)
 library(ggplot2)
 library(ggmap)
 library(RColorBrewer)
+library(treemap)
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
 
 ```{r import-data}
 all_listings <- read_csv("airbnb_master.csv")
@@ -21,33 +21,72 @@ all_hosts <- read_csv("host_master.csv")
 ```
 
 
-```{r violin plot of prices grouped by locale}
-#Grab Data only needed for violin plot
+```{r Rating vs RPM Scatter}
+listing_scatter <- all_listings %>%
+  select(listing_id,
+         overall_rating,
+         reviews_per_month,
+         locale)
+
+rating_rpm <- ggplot(listing_scatter, aes(x = reviews_per_month, y = overall_rating)) + 
+  geom_point(col = "red", alpha = 0.2)
+
+rating_rpm
+```
+
+
+```{r Violin plot of prices grouped by locale}
+# Grab Data only needed for violin plot
 violin_data <- all_listings %>%
   select(price_per_night, locale)
   
-#Convert locale variable to factor variable
+# Convert locale variable to factor variable
 violin_data$locale <- as.factor(violin_data$locale)
 
-#Get rid of outliers
+# Get rid of outliers
 Q1 <- quantile(violin_data$price_per_night, .25)
 Q3 <- quantile(violin_data$price_per_night, .75)
 IQR <- IQR(violin_data$price_per_night)
 
 no_outliers <- subset(violin_data, violin_data$price_per_night > (Q1 - 1.5*IQR) & violin_data$price_per_night < (Q3 + 1.5*IQR))
 
-#Reorder locales by median price
+# Reorder locales by median price
 no_outliers %>%
   mutate(locale = fct_reorder(locale, price_per_night, .fun="median"))
 
-#Create the violin plot
+# Create the violin plot
 violin_plot <- ggplot(no_outliers, aes(x=reorder(locale, price_per_night), y=price_per_night, fill=locale)) + 
   geom_violin(trim=FALSE) +
   geom_boxplot(width=0.1, fill="white") + 
   labs(title="Pricing Distribution across Locales",x="Locale", y = "Price per Night")
   
-#Print plot
+# Print plot
 violin_plot
+```
+
+
+```{r Treemap Roomtype}
+# Pull relevant vars
+roomtype_counts <- all_listings %>%
+  select(locale,
+         room_type,
+         bedrooms,
+         beds)
+
+# Filter by locale
+roomtype_counts <- roomtype_counts %>%
+  filter(locale == "Hawaii")
+
+# Count frequency by room type
+roomtype_counts <- data.frame(table(roomtype_counts$room_type))
+
+# Create Tree map
+roomtype_map <- treemap(roomtype_counts,
+                        index = c("Var1"),
+                        vSize = "Freq", type = "index")
+
+# Print Tree map
+roomtype_map
 ```
 
 
@@ -55,12 +94,12 @@ violin_plot
 austin_map <- all_listings %>%
   filter(locale == "Austin") 
 
-#Configure Map
+# Configure Map
 map_bounds <- c(left = min(austin_map$longitude),
                 right = max(austin_map$longitude), 
                 bottom = min(austin_map$latitude), 
                 top = max(austin_map$latitude))
-austin <- get_stamenmap(map_bounds, zoom = 15, maptype = "toner-lite")
+austin <- get_stamenmap(map_bounds, zoom = 12, maptype = "toner-lite")
 
 austin<- ggmap(austin, extent="device", legend="none")
 austin <- austin + stat_density2d(data=austin_map,  aes(x=longitude, y=latitude, fill=..level.., alpha=..level..), geom="polygon")

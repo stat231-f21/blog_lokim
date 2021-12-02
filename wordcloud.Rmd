@@ -18,14 +18,13 @@ library(wordcloud2)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
 ```{r import-data}
 all_listings <- read_csv("airbnb_master.csv")
 all_hosts <- read_csv("host_master.csv")
 ```
 
 
-```{r wordcloud listing_description} 
+```{r Wordcloud Description} 
 #https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
 #prep data frame
 listing_desc <- all_listings %>%
@@ -60,8 +59,12 @@ set.seed(53)
 wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words=70, random.order=FALSE, rot.per=0.3,            colors=brewer.pal(8, "Dark2"))
 ```
 
+```{r Description Barchart}
 
-```{r wordcloud} 
+```
+
+
+```{r Wordcloud Name} 
 #https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
 #prep data frame
 listing_name <- all_listings %>%
@@ -97,7 +100,7 @@ wordcloud(words = df_name$word, freq = df_name$freq, min.freq = 1, max.words=70,
 ```
 
 
-```{r word frequency barchart}
+```{r Name Barchart}
 #data <- data[with(data,order(-Score)),]
 
 #data <- data[1:10,]
