@@ -12,6 +12,7 @@ library(ggplot2)
 library(ggmap)
 library(RColorBrewer)
 library(treemap)
+library(leaflet)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
@@ -58,7 +59,8 @@ no_outliers %>%
 violin_plot <- ggplot(no_outliers, aes(x=reorder(locale, price_per_night), y=price_per_night, fill=locale)) + 
   geom_violin(trim=FALSE) +
   geom_boxplot(width=0.1, fill="white") + 
-  labs(title="Pricing Distribution across Locales",x="Locale", y = "Price per Night")
+  labs(title="Pricing Distribution across Locales",x="Locale", y = "Price per Night") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
   
 # Print plot
 violin_plot
@@ -89,6 +91,11 @@ roomtype_map <- treemap(roomtype_counts,
 
 # Print Tree map
 roomtype_map
+```
+
+
+```{r Geospatial Map}
+
 ```
 
 
