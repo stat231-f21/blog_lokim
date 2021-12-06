@@ -24,21 +24,6 @@ index_housing <- read_csv("housing_index.csv")
 ```
 
 
-```{r scatter acceptance_rate vs listings_count}
-# Prep data frame: convert id_host to factor var
-hosts_scatter_b <- hosts_scatter %>%
-  mutate(host_id = as.factor(id_host))
-  filter(hosts_scatter, host_listings_count_total > 10)
-
-# Create plot object
-acc_listings_scatter <- ggplot(hosts_scatter_b, aes(x=host_listings_count_total, y=host_acceptance_proportion)) +
-  geom_point(color = "red", alpha = 0.2) 
-
-# Print Scatterplot
-acc_listings_scatter
-```
-
-
 ```{r scatter acceptance_rate vs response_rate}
 # Pull needed vars
 hosts_scatter <- all_hosts %>%
@@ -51,10 +36,32 @@ hosts_scatter <- all_hosts %>%
 # Create plot object
 acc_res_scatter <- ggplot(hosts_scatter, aes(x=host_response_proportion, y=host_acceptance_proportion)) +
   geom_hex(bins = 20,alpha = 0.9) + 
-  scale_fill_gradient2(low="yellow",high="red")
+  scale_fill_gradient2(low="yellow",high="red") + 
+  xlab("Host Response Rate") + 
+  ylab("Host Acceptance Rate") + 
+  ggtitle("Acceptance Rate vs Response Rate") +
+  labs(fill = "# of Hosts")
 
 # Print Object
 acc_res_scatter
+```
+
+
+```{r scatter acceptance_rate vs listings_count}
+# Prep data frame: convert id_host to factor var
+hosts_scatter_b <- hosts_scatter %>%
+  mutate(host_id = as.factor(id_host))
+  filter(hosts_scatter, host_listings_count_total > 10)
+
+# Create plot object
+acc_listings_scatter <- ggplot(hosts_scatter_b, aes(x=host_listings_count_total, y=host_acceptance_proportion)) +
+  geom_point(color = "Orange", alpha = 0.3) + 
+  xlab("Host Number of Listings") + 
+  ylab("Host Acceptance Rate") + 
+  ggtitle("Acceptance Rate vs Number of Listings")
+
+# Print Scatterplot
+acc_listings_scatter
 ```
 
 
@@ -64,10 +71,21 @@ month_counts <- data.frame(table(all_hosts$month_host_joined))
 
 # Create bar chart object
 month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
-  geom_col() 
+  geom_col() + 
+  xlab("Month Joined") +
+  ylab("# of Hosts Joined") + 
+  ggtitle("# of Hosts Joined by Month") + 
+  theme(legend.position = "none")
 
 # Print bar chart
 month_bar
+```
+
+```{r host_since RETRY}
+host_since_data <- all_hosts %>%
+  select(host_since, id_host)
+
+
 ```
 
 
@@ -82,9 +100,16 @@ joined_since$host_since <- format(joined_since$host_since,"%m/%Y")
 # Summarize counts
 joined_summary <- data.frame(table(joined_since$host_since))
 
+# Refactor vars
+ joined_summary <- joined_summary %>%
+   mutate(date = as.Date(Var1, format = "%m/%Y"))
+
 # Create plot 
 host_since_plot <- ggplot(joined_summary, aes(x = as.numeric(Var1), y = Freq)) + 
-  geom_line(col = "red") 
+  geom_line(col = "red") + 
+  xlab("Date Joined") + 
+  ylab("# of Hosts Joined ") + 
+  ggtitle("# of Hosts Joined over Time")
 
 # Print plot
 host_since_plot

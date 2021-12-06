@@ -30,7 +30,10 @@ listing_scatter <- all_listings %>%
          locale)
 
 rating_rpm <- ggplot(listing_scatter, aes(x = reviews_per_month, y = overall_rating)) + 
-  geom_point(col = "red", alpha = 0.2)
+  geom_point(col = "red", alpha = 0.2) + 
+  xlab("Reviews Per Month") + 
+  ylab("Overall Rating out of 5") + 
+  ggtitle("Rating vs Reviews Per Month")
 
 rating_rpm
 ```

@@ -17,6 +17,16 @@ library(purrr)
 library(janitor)
 library(tidytext)
 library(readr)
+library(ggplot2)
+library(ggmap)
+library(RColorBrewer)
+library(car)
+library(scales)
+library(treemap)
+library(leaflet)
+library(tm)
+library(wordcloud)
+library(wordcloud2)
 
 # Set code chunk defaults 
 knitr::opts_chunk$set(echo = FALSE, 
@@ -28,14 +38,177 @@ knitr::opts_chunk$set(echo = FALSE,
 options(knitr.kable.NA = '')
 ```
 
-# Introduction
+```{r import-data, include = FALSE}
+all_listings <- read_csv("airbnb_master.csv")
+all_hosts <- read_csv("host_master.csv")
+```
 
-# The Data
+# **Introduction**
 
-# Analysis
 
-## Airbnb Housing Trends
-## Airbnb Host Trends
+
+
+# **The Data**
+
+The data for this project was downloaded from a KAGGLE dataset. I found a 3rd party website, InsideAirbnb, that scrapes public Airbnb website data and provides downloadable csvs for datasets pertaining to locales around the world.
+
+I first identified that I wanted to focus on identifying trends within the United States; thus, I downloaded csv files for each of the 
+
+
+
+
+
+# **Describing and Naming Your Airbnb**
+
+**Purpose:** Part of being a successful Airbnb Host depends on your ability to persuade users to select your house over dozesn of similar options. Whether it be through fancy photos or a vast menu of amenities, hosts also seem to focus on utilizing key buzz words to grab Airbnb users' attention. 
+
+The following section utilizes the `wordcloud` package to generate graphics relating to the frequency in which Airbnb buzz words appear in listing descriptions and names. In addition, word frequency bar charts are also generated as another means of comparing the frequencies of the most popular words in Airbnb Listing names and descriptions.
+
+* Listing Description: set of words used to describe an Airbnb Listing
+* Listing Name: set of words used as the name of the Airbnb Listing
+
+## **Word Clouds** {.tabset .tabset-fade .tabset-pills}
+
+**Method:** In order to prepare my data for the wordcloud creation, I utilized the `tm` package to wrangle my data and create a data frame with all the words utilized in the airbnb listings descriptions and names. 
+
+Because I already had columns (listing_name, listing_description) in my bulk dataset `all_listings` that provide the description and name for every unique airbnb property, the `tm` package made it very easy to prepare a simple data frame with every word in the listing_name and listing_description columns and their respective frequencies.
+
+```{r Word Cloud Prep, include = FALSE}
+description_words <- read_csv("description_words.csv")
+name_words <- read_csv("name_words.csv")
+```
+
+### Listing Name
+```{r Listing Name Word Cloud, echo = FALSE, fig.width = 7, fig.height = 3.2, fig.align='left'}
+# Set wordcloud seed for consistency
+set.seed(50)
+
+# Create wordcloud
+wordcloud(words = name_words$word,
+          freq = name_words$freq,
+          min.freq = 1, 
+          max.words=70, 
+          random.order=FALSE, 
+          rot.per=0.3,          
+          colors=brewer.pal(8, "Dark2"))
+```
+
+**Takeaways:** The wordclouds are compiled by taking the most frequent words in the Airbnb Listing Names and Descriptions. As indicated by the graphic, some key words that many current Airbnb hosts utilize include "Private", "Bedroom", "Spacious" "Home".
+
+A quick glance at the wordcloud shows that many of the words used for the Airbnb Listing name seem to serve a couple primary purposes: 
+* Describe the physical location
+* Describe the type of property
+
+Many of the words serve as adjectives describing the house such as "charming", "Beautiful", "Gorgeous". In addition, we also seem to have many words that describe the type of property that host is advertising: "Apartment", "Oceanfront", "Modern", "Suite", "Studio".
+
+### Listing Description
+```{r Listing Description Word Cloud, echo = FALSE, fig.width = 7, fig.height = 3.2, fig.align='left'}
+# Set wordcloud seed for consistency
+set.seed(50)
+
+# Create wordcloud
+wordcloud(words = description_words$word,
+          freq = description_words$freq,
+          min.freq = 1, 
+          max.words=70, 
+          random.order=FALSE, 
+          rot.per=0.1,            
+          colors=brewer.pal(8, "Dark2"))
+```
+
+**Takeaways:** The wordclouds are compiled by taking the most frequent words in the Airbnb Listing Names and Descriptions. As indicated by the graphic, some key words that many current Airbnb hosts utilize include "Private", "Bedroom", "Spacious" "Home".
+
+A quick glance at the wordcloud shows that many of the words used for the Airbnb Listing name seem to serve a couple primary purposes: 
+* Describe the physical location
+* Describe the type of property
+
+Many of the words serve as adjectives describing the house such as "charming", "Beautiful", "Gorgeous". In addition, we also seem to have many words that describe the type of property that host is advertising: "Apartment", "Oceanfront", "Modern", "Suite", "Studio".
+
+## **Word Barcharts** {.tabset .tabset-fade .tabset-pills}
+
+**Method** Along with the `ggplot2` package, I utilized the same dataframes created by my wordcloud wrangling to create barcharts of the top 10 occuring words in the Airbnb Listing Name and Description. 
+
+```{r Word Barchart Prep, include = FALSE}
+name_freq <- name_words[order(-name_words$freq),] %>%
+  top_n(10)
+desc_freq <- description_words[order(-description_words$freq),] %>%
+  top_n(10)
+```
+
+### Listing Name
+```{r Listing Name Bar Chart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create plot object
+name_bar <- ggplot(data = name_freq, aes(x=reorder(word, freq), y=freq, fill = word)) +
+  geom_col() +
+  coord_flip() + 
+  xlab("") + 
+  ylab("Frequency") + 
+  ggtitle("Listing Name - Word Frequency")
+  
+# Print plot
+name_bar
+```
+
+**Takeaways:** For the Listing Name bar chart, we can see that the most commonly used word is "Private" From personal experience, I remember that one of my search criteria in looking for an Airbnb to stay at was that the property is for myself and only myself. The keyword "Private" is most likely used in the Airbnb Listing Name so that users can quickly assess if the property will be for their use only.
+
+The "Private" distinction may serve to be very important since Airbnb Hosts want to effectively communicate what type of property a user may be inquiring for. It would be very frustrating for users if they were to discover that their airbnb of interest was not "Private" later rather than earlier in their booking process.
+
+### Listing Description
+```{r Listing Description Bar Chart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create plot object
+desc_bar <- ggplot(data = desc_freq, aes(x=reorder(word, freq), y=freq, fill = word)) +
+  geom_col() +
+  coord_flip() + 
+  xlab("") + 
+  ylab("Frequency") + 
+  ggtitle("Listing Description - Word Frequency")
+
+# Print plot
+desc_bar
+```
+
+**Takeaways:** For the Listing Name bar chart, we can see that the most commonly used word is "Private" From personal experience, I remember that one of my search criteria in looking for an Airbnb to stay at was that the property is for myself and only myself. The keyword "Private" is most likely used in the Airbnb Listing Name so that users can quickly assess if the property will be for their use only.
+
+The "Private" distinction may serve to be very important since Airbnb Hosts want to effectively communicate what type of property a user may be inquiring for. It would be very frustrating for users if they were to discover that their airbnb of interest was not "Private" later rather than earlier in their booking process.
+
+
+
+
+
+# **Trends in Airbnb Hosts**
+
+**Purpose:** Lets consider the perspective of an Airbnb Host. What qualities of the Airbnb Hosts matter most in terms of generating high rates of bookings for their properties. 
+
+This section strives to identify key variables regarding Airbnb Hosts that ultimately drive their success. While exploring the dataset from InsideAirbnb, I found a vast array of variables that could be used to explore Airbnb Host qualities. These variables include:
+* `host_since`: Date when host joined
+* `host_response_proportion`: Proportion of booking messages that the Host responds too
+* `host_acceptance_proportion`: Proportion of booking requests that the Host accepts
+* 
+
+
+
+
+## **
+
+
+
+
+# **Trends in Airbnb Listings**
+
+
+# **Conclusions**
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # Header 1 (Section heading)
@@ -116,38 +289,5 @@ Equations may be needed if you are explaining a new technique or perhaps providi
 For typesetting equations appropriately, take a look at the *Symbols in math mode* section of this  [cheat sheet](https://users.dickinson.edu/~richesod/latex/latexcheatsheet.pdf)  (or do some extra Googling---there are *many* resources).
 
 
-# You can even create tabs within your webpage if you want! {.tabset .tabset-fade .tabset-pills}
-
-Every subsection heading (starting with `##`) until you create a new section heading (starting with `#`) will be a new tab.
-
-## Bulleted list
-
-You can make a bulleted list like this:
-
-* item 1
-* item 2
-* item 3
 
 
-## Numbered list
-
-You can make a numbered list like this
-
-1. First thing I want to say
-2. Second thing I want to say
-3. Third thing I want to say
-
-# Customizing your blog design
-
-As a *final* detail **only** if you have time, you can explore options for customizing the style of your blog. By default, we are using the `readthedown` theme from the [**rmdformats** package](https://github.com/juba/rmdformats) (see Line 6 of this file if you want to switch out themes). There are, I'm sure, many many many more similar packages with built in themes, or you can look into how to include a CSS code chunk to customize aspects of the current theme.  
-
-There are some easy-to-change options that you can play around with:
-
-* The theme itself (Line 6): `rmdformats::readthedown`, `rmdformats::downcute`, `rmdformats::robobook`, `rmdformats::material`,
-  * For `downcute` only, you can add a new indented line below Line 6 with the code `downcute_theme: "chaos"` for the `downcute chaos` theme
-  * I would *not* recommend the other themes that do not have the sidebar navigation
-  
-* Syntax highlighting options (Line 8, `highlight`): `"default"`, `"tango"`, `"pygments"`, `"kate"`, `"monochrome"`, `"espresso"`, `"zenburn"`, `"haddock"`, or `"textmate"` (or `NULL` for no syntax highlighting)
-
-
-You can explore additional customizable YAML options by looking at the [**rmdformats** package](https://github.com/juba/rmdformats) page or running, for example, `?rmdformats::readthedown()` to see the help documentation for a particular theme from the package.

@@ -52,11 +52,13 @@ matrix <- as.matrix(dtm)
 words <- sort(rowSums(matrix),decreasing=TRUE)
 df <- data.frame(word = names(words),freq=words)
 
+write_csv(df, "description_words.csv")
+
 #set wordcloud seed for consistency
 set.seed(53)
 
 #create wordcloud
-wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words=70, random.order=FALSE, rot.per=0.3,            colors=brewer.pal(8, "Dark2"))
+wordcloud(words = df$word, freq = df$freq, min.freq = 1, max.words=70, random.order=FALSE, rot.per=0.5,            colors=brewer.pal(8, "Dark2"))
 ```
 
 ```{r Description Barchart}
@@ -101,6 +103,8 @@ dtm_name <- TermDocumentMatrix(corp_name)
 matrix_name <- as.matrix(dtm_name)
 words_name <- sort(rowSums(matrix_name),decreasing=TRUE)
 df_name <- data.frame(word = names(words_name),freq=words_name)
+
+write_csv(df_name, "name_words.csv")
 
 #set wordcloud seed for consistency
 set.seed(53)
