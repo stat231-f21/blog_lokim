@@ -202,7 +202,7 @@ Let's consider the perspective of an Airbnb Host. What qualities of the Airbnb H
 The following plots do not answer the questions above but attempt to add direction.
 
 
-## **When Should I Join?**
+## **When Should I Join**
 
 **Host Joining Rates by Month**
 
@@ -230,7 +230,7 @@ month_bar
 
 A further analysis of the seasonality of Airbnb hosts joining could include isolating the locations of the Airbnb hosts so that geographical effects are controlled for. 
 
-## **Consider the Housing Market?**
+## **Consider the Housing Market**
 
 **Hosts Joining Rates by Year**
 
@@ -317,7 +317,7 @@ acc_res_scatter
 
 **Takeaways:** It is clear that the greatest number of hosts seem to have a Host response rate close to 1 and a Acceptance rate of 1. Does this indicate that "responsive" hosts are more likely to successfully accept a booking request? While we can see that hosts exhibit response rates and acceptance rates anywhere from 0 to 1, but the majority of hosts seem to have high acceptance and response rates. Prospective hosts may have to consider how responsive they have to be in order to increase the booking acceptance rates.
 
-## **Is More Better?**
+## **Is More Better**
 
 **Acceptance Rate vs Number of Listings**
 
@@ -353,121 +353,114 @@ acc_listings_scatter
 
 # **Trends in Airbnb Listings**
 
-This section strives to identify key variables regarding Airbnb Hosts that ultimately drive their success. While exploring the dataset from InsideAirbnb, I found a vast array of variables that could be used to explore Airbnb Host qualities. These variables include:
+This section focuses on qualities pertaining to a specific Airbnb Listing. Utilizing the available metrics provided by Inside Airbnb, I take a look at the pricing distributions of properties across locales and examine further quantities such as reviews per month, ratings, and property type. The heavily utilized variables include:
 
-* `host_since`: Date when host joined
-* `host_response_proportion`: Proportion of booking messages that the Host responds too
-* `host_acceptance_proportion`: Proportion of booking requests that the Host accepts
-* `host_lisings_count_total`: Number of Listings Host owns
+* `locale`: City/Area of listing
+* `room_type`: The type of listing
+* `latitude`: Latitude coordinate of listing
+* `longitude`: Longitude coordinate of listing
+* `reviews_per_month`: Average number of reviews per month of listing
+* `price_per_night`: The sticker price per night of listing (For 1 night)
+* `overall_rating`: The rating of the listing from 1 to 5
 
-Let's consider the perspective of an Airbnb Host. What qualities of the Airbnb Hosts matter most in terms of generating high rates of bookings for their properties (Acceptance Rate)? Is there a certain time in which a host should join? What external factors should the host consider? Should I get more Airbnb properties? 
+Why do these metrics matter? If you are considering listing a property in a locale, you probably want to know the general price per night other Airbnb hosts are charging. These are the types of questions this section aims to address.
 
-The following plots do not answer the questions above but attempt to add direction.
-
+There are a plethora of factors to consider in analyzing a listing, however here I focus on general trends for Airbnb listings
 
 ## **Strive for Reviews**
 
 **Ratings vs Reviews**
 
-**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+**Method:** Using the `overall_rating variable` and `reviews_per_month` from my wrangled dataset,` all_listings`, I created a scatterplot to visualize any relationships between the number of reviews a listing receieves and the rating of the listing. The Rating scale ranges from **1** to **5**.
 
-```{r When Should I Join Prep, include = FALSE}
-# Create data frame with counts of hosts joining each month
-month_counts <- data.frame(table(all_hosts$month_host_joined))
+```{r Ratings vs Reviews Prep, include = FALSE}
+# Pull needed vars
+listing_scatter <- all_listings %>%
+  select(listing_id,
+         overall_rating,
+         reviews_per_month,
+         locale)
 ```
 
-```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
-# Create bar chart object
-month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
-  geom_col() + 
-  xlab("Month Joined") +
-  ylab("# of Hosts Joined") + 
-  ggtitle("# of Hosts Joined by Month") + 
-  theme(legend.position = "none")
+```{r Ratings vs Reviews Plot, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create Scatter plot
+rating_rpm <- ggplot(listing_scatter, aes(x = reviews_per_month, y = overall_rating)) + 
+  geom_point(col = "red", alpha = 0.2) + 
+  xlab("Reviews Per Month") + 
+  ylab("Overall Rating out of 5") + 
+  ggtitle("Rating vs Reviews Per Month")
 
-# Print bar chart
-month_bar
+# Print plot
+rating_rpm
 ```
 
-**Takeaways:** asdf adsfs sdf sdf 
+**Takeaways:** This plot exhibits logarithmic growth in the listing's rating as the number of reviews per month increases. It is clear that listings that have few ratings can range from a rating of 1 to 5. However, as the number of reviews increases heavily, the listings exhibit ratings of 4 or greater. This is important to consider as a host because having a lot of good reviews may boost your listing's rating. 
 
-## **Where Should I Go?**
+## **Where Should I Go**
+
+**Price Distribution Across Locales**
+
+**Method:** Because each csv file from InsideAirbnb was downloaded by city, I included a new variable `locale` during the initial wrangling to keep track of which city the Airbnb listing is from. I also eliminated outliers that have values greater than 1.5 x the IQR (Interquartile Range). The following plot utilizes `geom_violin` from `ggplot`.
+
+```{r Violin Plot Prep, include = FALSE}
+# Grab Data only needed for violin plot
+violin_data <- all_listings %>%
+  select(price_per_night, locale)
+  
+# Convert locale variable to factor variable
+violin_data$locale <- as.factor(violin_data$locale)
+
+# Get rid of outliers
+Q1 <- quantile(violin_data$price_per_night, .25)
+Q3 <- quantile(violin_data$price_per_night, .75)
+IQR <- IQR(violin_data$price_per_night)
+
+no_outliers <- subset(violin_data, violin_data$price_per_night > (Q1 - 1.5*IQR) & violin_data$price_per_night < (Q3 + 1.5*IQR))
+
+# Reorder locales by median price
+no_outliers %>%
+  mutate(locale = fct_reorder(locale, price_per_night, .fun="median"))
+```
+
+```{r Violin Plot, echo = FALSE, fig.align='left', fig.width = 8, fig.height = 5}
+# Create the violin plot
+violin_plot <- ggplot(no_outliers, aes(x=reorder(locale, price_per_night), y=price_per_night, fill=locale)) + 
+  geom_violin(trim=FALSE) +
+  geom_boxplot(width=0.1, fill="white") + 
+  labs(title="Pricing Distribution across Locales",x="Locale", y = "Price per Night") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) + 
+  theme(legend.position = "none") + 
+  theme(axis.title.x = element_blank())
+  
+# Print plot
+violin_plot
+```
+
+**Takeaways:** I initially hypothesized that New York and San Fransico would have the greatest median price per night since they have higher costs of living. Contrary to my belief, locales like Hawaii, Nashville, and San Diego have considerably higher median prices than the other locales.
+
+Grouping the locales by weather, it seems like warmer locales have higher median prices than colder locales like Chicago, New York, Denver. Could this be another indicator of the seasonality of running an Airbnb business? This is interesting because I thought the housing market and its projection of prices would be more closely reflected in the median Airbnb price per night across locales.
+
+
+## **What Kind of Property**
 
 **Ratings vs Reviews**
 
 **Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
 
-```{r When Should I Join Prep, include = FALSE}
-# Create data frame with counts of hosts joining each month
-month_counts <- data.frame(table(all_hosts$month_host_joined))
-```
 
-```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
-# Create bar chart object
-month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
-  geom_col() + 
-  xlab("Month Joined") +
-  ylab("# of Hosts Joined") + 
-  ggtitle("# of Hosts Joined by Month") + 
-  theme(legend.position = "none")
-
-# Print bar chart
-month_bar
-```
-
-**Takeaways:** asdf adsfs sdf sdf 
-
-## **What Kind of Property?**
-
-**Ratings vs Reviews**
-
-**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
-
-```{r When Should I Join Prep, include = FALSE}
-# Create data frame with counts of hosts joining each month
-month_counts <- data.frame(table(all_hosts$month_host_joined))
-```
-
-```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
-# Create bar chart object
-month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
-  geom_col() + 
-  xlab("Month Joined") +
-  ylab("# of Hosts Joined") + 
-  ggtitle("# of Hosts Joined by Month") + 
-  theme(legend.position = "none")
-
-# Print bar chart
-month_bar
-```
 
 **Takeaways:** asdf adsfs sdf sdf
 
-## **Super Cool Heat Map?**
+## **Super Cool Heat Map**
 
 **Super Cool Heat Map**
 
 **Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
 
-```{r When Should I Join Prep, include = FALSE}
-# Create data frame with counts of hosts joining each month
-month_counts <- data.frame(table(all_hosts$month_host_joined))
-```
-
-```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
-# Create bar chart object
-month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
-  geom_col() + 
-  xlab("Month Joined") +
-  ylab("# of Hosts Joined") + 
-  ggtitle("# of Hosts Joined by Month") + 
-  theme(legend.position = "none")
-
-# Print bar chart
-month_bar
-```
 
 **Takeaways:** asdf adsfs sdf sdf
+
+
 
 
 

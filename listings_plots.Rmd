@@ -80,7 +80,7 @@ roomtype_counts <- all_listings %>%
 
 # Filter by locale
 roomtype_counts <- roomtype_counts %>%
-  filter(locale == "Boston")
+  filter(locale == "Austin")
 
 # Count frequency by room type
 roomtype_counts <- data.frame(table(roomtype_counts$room_type))
