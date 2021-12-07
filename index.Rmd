@@ -73,12 +73,13 @@ I first identified that I wanted to focus on identifying trends within the Unite
 
 # **Describing and Naming Your Airbnb**
 
-Part of being a successful Airbnb Host depends on your ability to persuade users to select your house over dozesn of similar options. Whether it be through fancy photos or a vast menu of amenities, hosts also seem to focus on utilizing key buzz words to grab Airbnb users' attention. 
-
 The following section utilizes the `wordcloud` package to generate graphics relating to the frequency in which Airbnb buzz words appear in listing descriptions and names. In addition, word frequency bar charts are also generated as another means of comparing the frequencies of the most popular words in Airbnb Listing names and descriptions.
 
 * Listing Description: set of words used to describe an Airbnb Listing
 * Listing Name: set of words used as the name of the Airbnb Listing
+
+Part of being a successful Airbnb Host depends on your ability to persuade users to select your house over dozesn of similar options. Whether it be through fancy photos or a vast menu of amenities, hosts also seem to focus on utilizing key buzz words to grab Airbnb users' attention. 
+
 
 ## **Word Clouds** {.tabset .tabset-fade .tabset-pills}
 
@@ -443,13 +444,87 @@ Grouping the locales by weather, it seems like warmer locales have higher median
 
 ## **What Kind of Property**
 
-**Ratings vs Reviews**
+**Treemap of Property Types**
 
-**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+**Method:** These pi-chart like graphs were generated utilizing the `treemap` package. This two level treemap is broken into two main categories. The General Shade of color represents the Locale while the specific shade of color represnets a subcategory of property type. All locales have 4 property types: Entire Home/Apt, Hotel Room, Private Room, Shared Room. The area of the box in the treemap represents the number of instances for that subcategory.
 
 
+```{r Treemap Setup, include = FALSE}
+# City Groupings
+groupA = c(rep("Austin",4),rep("Boston",4),rep("Chicago",4),rep("Denver",4))
+groupB = c(rep("Hawaii",4),rep("Los Angeles",4),rep("Nashville",4),rep("New Orleans",4))
+groupC = c(rep("New York",4),rep("San Diego",4),rep("San Francisco",4),rep("Seattle",4))
 
-**Takeaways:** asdf adsfs sdf sdf
+# Sub categories of properties
+subgroup = c("Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room")
+
+# Counts for each property type for each city
+valueA = c(4295,6,683,60,
+            806,16,553,5,
+            2731,33,1060,54,
+            1965,8,403,12)
+valueB = c(12662,70,1128,22,
+            10120,66,3785,248,
+            3760,47,388,7,
+            3219,17,416,12)
+valueC = c(6961,108,5374,185,
+            5350,7,1037,55,
+            2061,44,1076,58,
+            2086,453,16,0)
+
+# Data frames for each tree map
+treeA = data.frame(groupA,subgroup,valueA)
+treeB = data.frame(groupB,subgroup,valueB)
+treeC = data.frame(groupC,subgroup,valueC)
+```
+
+``` {r Treemap 1-4, echo = FALSE, fig.align='left', fig.width = 8, fig.height = 5 }
+# Print Tree
+treemap(treeA,
+        index = c("groupA","subgroup"),
+        vSize = "valueA",
+        type = "index",
+        border.col = c("black","white"),
+        border.lwds = c(2,2),
+        overlap.labels = 0,
+        palette = "Set3",
+        title = "Austin, Boston, Chicago, Denver")
+```
+
+``` {r Treemap 5-8, echo = FALSE, fig.align='left', fig.width = 8, fig.height = 5 }
+# Print Tree
+treemap(treeB,
+        index = c("groupB","subgroup"),
+        vSize = "valueB",
+        type = "index",
+        border.col = c("black","white"),
+        border.lwds = c(2,2),
+        overlap.labels = 0,
+        palette = "Set2",
+        title = "Hawaii, Los Angeles, Nashville, New Orleans")
+```
+
+``` {r Treemap 9-12, echo = FALSE, fig.align='left', fig.width = 8, fig.height = 5 }
+# Print Tree
+treemap(treeC,
+        index = c("groupC","subgroup"),
+        vSize = "valueC",
+        type = "index",
+        border.col = c("black","white"),
+        border.lwds = c(2,2),
+        overlap.labels = 0,
+        palette = "Set3",
+        title = "New York, San Diego, San Francisco, Seattle")
+```
+
+**Takeaways:** There are multiple variables this treemap describes. Within a specific locale (general shade of color), we can see the distribution of property types. It seems that most locales have the majority of their properties as Entire home/apt. Private room takes a distanct second for most locales as well.
+
+Comparing across Locales, we can see that large cities like New York, San Francisco, Chicago, Los Angeles, Boston actually has a relatively large amount of Private rooms. Maybe this is what is driving the median price down.
+
+In contrast, it seems like vacation locales like Hawaii, San Diego, have a smaller proportion of private rooms and shared rooms.
 
 ## **Super Cool Heat Map**
 

@@ -80,7 +80,7 @@ roomtype_counts <- all_listings %>%
 
 # Filter by locale
 roomtype_counts <- roomtype_counts %>%
-  filter(locale == "Austin")
+  filter(locale == "Seattle")
 
 # Count frequency by room type
 roomtype_counts <- data.frame(table(roomtype_counts$room_type))
@@ -92,10 +92,88 @@ roomtype_map <- treemap(roomtype_counts,
                         type = "index",
                         palette = "Set2")
 
+#group <- c(rep("Austin",4),rep("Boston",4),rep("Chicago",4),rep("Denver",4),rep("Hawaii",4),rep("Los Angeles",4),rep("Nashville",4),
+#rep("New Orleans",4),rep("New York",4),rep("San Diego",4),rep("San Francisco",4),rep("Seattle",4))
+
+#subgroup <- c("Entire home/apt","Hotel room","Private room","Shared room")
+
+#value = c(4295,6,683,60,
+            #806,16,553,5,
+            #2731,33,1060,54
+            #1965,8,403,12
+            #12662,70,1128,22
+            #10120,66,3785,248
+            #3760,47,388,7
+            #3219,17,416,12
+            #6961,108,5374,185
+            #5350,7,1037,55
+            #2061,44,1076,58
+            #2086,453,16,0
+
 # Print Tree map
 roomtype_map
 ```
+```{r TREEMAP}
+group = c(rep("Austin",4),rep("Boston",4),rep("Chicago",4),rep("Denver",4),rep("Hawaii",4),rep("Los Angeles",4),rep("Nashville",4),
+           rep("New Orleans",4),rep("New York",4),rep("San Diego",4),rep("San Francisco",4),rep("Seattle",4))
+subgroup <- c("Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room")
+value = c(4295,6,683,60,
+            806,16,553,5,
+            2731,33,1060,54,
+            1965,8,403,12,
+            12662,70,1128,22,
+            10120,66,3785,248,
+            3760,47,388,7,
+            3219,17,416,12,
+            6961,108,5374,185,
+            5350,7,1037,55,
+            2061,44,1076,58,
+            2086,453,16,0)
+data = data.frame(group,subgroup,value)
+treemap(data,
+        index = c("group","subgroup"),
+        vSize = "value",
+        type = "index",
+        border.col = c("black","white"),
+        border.lwds = c(7,2),
+        overlap.labels = 1)
 
+```
+
+```{r treemap 2}
+group1 = c(rep("Austin",4),rep("Boston",4),rep("Chicago",4),rep("Denver",4),rep("Hawaii",4),rep("Los Angeles",4))
+subgroup1 <- c("Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room",
+              "Entire home/apt","Hotel room","Private room","Shared room")
+value1 = c(4295,6,683,60,
+            806,16,553,5,
+            2731,33,1060,54,
+            1965,8,403,12,
+            12662,70,1128,22,
+            10120,66,3785,248)
+data1 = data.frame(group1,subgroup1,value1)
+treemap(data1,
+        index = c("group1","subgroup1"),
+        vSize = "value1",
+        type = "index",
+        border.col = c("black","white"),
+        border.lwds = c(1,1),
+        overlap.labels = 1)
+```
 
 ```{r Geospatial Map}
 
