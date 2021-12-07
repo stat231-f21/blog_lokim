@@ -43,32 +43,50 @@ all_listings <- read_csv("airbnb_master.csv")
 all_hosts <- read_csv("host_master.csv")
 ```
 
-# **Introduction**
+# **Why Airbnb**
 
+```{r, echo = FALSE, fig.align='left'}
+knitr::include_graphics("https://www.dgtlnk.com/wp-content/uploads/airbnb_logo_detail.jpg")
+```
 
+## **Background**
+
+Airbnb is a mobile/web platform that acts as a marketplace for vacationers to rent out other people's homes. The app allows everyday people to get involved with the home rentral market. In addition, Airbnb has alleviated much of the headache of trying to find an alternative to hotel rooms. 
+
+## **Why Airbnb**
+
+I chose Airbnb beacuse of my growing interest in the real estate market and real estate investing. While becoming a host for Airbnb is not one of my immediate goals, I was interested in metrics relating to the Hosts decision making process of joining Airbnb. What factors should a prospective Airbnb host consider before joining? 
+
+Some questions I seek to explore involve: **A)** The pricing of a lisiting **B)** Factors that drive the listing's ratings **C)** Geographic differences in general Airbnb trends **D)** When should a host join
+
+## **Terminology**
+
+**Listing** : A property that can be rented through the Airbnb platform
+
+**Host** : Someone who utilizes the Airbnb platform to rent out their property (listing).
 
 
 # **The Data**
 
-To answer my questions about Airbnb, I needed a dataset that contains metrics beyond the sticker price of each airbnb property. Luckily, I found a website, [Inside Airbnb](http://insideairbnb.com/index.html) that provides airbnb datasets for cities across the world. Inside Airbnb periodically scrapes data from the Airbnb website to update their data for each city.
+To answer my questions about Airbnb, I needed a dataset that contains metrics beyond the sticker price of each Airbnb property. Luckily, I found a website, [Inside Airbnb](http://insideairbnb.com/index.html) that provides Airbnb datasets for cities across the world. Inside Airbnb periodically scrapes data from the Airbnb website to update their data for each city.
 
 ## Getting / Picking Data
 
+Inside Airbnb offered downloadable csv files for 28 locales across the United States. Because each csv file ranged from 20 to 100mb, I selected the top 11 cities by population size in the United States. I also threw in Hawaii as a relative measure of any extreme geographic differences reflected in Airbnb trends.
 
+Each csv was manually uploaded and scraped and finally merged together to create one master list of every property across my selected locales.
 
 ## Wrangling
 
+After merging all the individual city csv files together, I had about 85 variables (columns) to choose from. Much of the wrangling I did involved:
 
+* Changing the variable types from `chr` to `num` 
+* Refactoring variables of type: `Date`
+* Converting percentages to decimals
+* Renaming columns and summarizing counts for different categories.
 
-
-[links](https://www.datadreaming.org/post/r-markdown-theme-gallery/)
-
-I found a 3rd party website, InsideAirbnb, that scrapes public Airbnb website data and provides downloadable csvs for datasets pertaining to locales around the world.
-
-I first identified that I wanted to focus on identifying trends within the United States; thus, I downloaded csv files for each of the 
-
-
-
+Once cleaning was done, I created two primary data sets for my plots: `all_listings.csv` and `all_hosts.csv`.
+For `all_listings.csv`, each row represents and individual Airbnb listig. For `all_hosts.csv`, each row represents a unique Airbnb host.
 
 
 # **Describing and Naming Your Airbnb**
@@ -526,94 +544,22 @@ Comparing across Locales, we can see that large cities like New York, San Franci
 
 In contrast, it seems like vacation locales like Hawaii, San Diego, have a smaller proportion of private rooms and shared rooms.
 
-## **Super Cool Heat Map**
+## **Listing Densities by Locale**
 
-**Super Cool Heat Map**
+**Leaflet Map**
 
-**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+**Method:** The map object was created with the `leaflet` package. Leaflet allows users to easily generate maps by inputing a set of coordinates. Although leaflet is not compatible with ggmap (I think), I used the `addCircleMarkers` method to add points using the longitude/latitude coordinates provided for each listing in my dataset. 
 
+```{r Shiny Map, out.extra="data-external=1", fig.height = 7, fig.width = 7.5, out.width = "100%"}
+# Embed shiny app
+knitr::include_app("https://lokim21.shinyapps.io/mapShinyApp/", 
+                   height = "700px")
+```
 
-**Takeaways:** asdf adsfs sdf sdf
-
-
-
-
-
-
-
-
-
-
-
-
-
-# **Looking Forward**
-
-
-
-
-
-
-
-
-
-
-
-
+**Takeaways:** The leaflet map allows users to see where listings are highly concentrated. By visualizing the density of airbnb listings in certain areas of a locale, potential hosts can select the type of market they want to enter: a) more urban setting with lots of competing hosts. b) Less competitive area where airbnb listings are more spread out.
 
 
 # Header 1 (Section heading)
-
-## Header 2 (Subsection heading)
-
-### Header 3 (Subsubsection heading)
-
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For example, you can include **Bold** and _Italic_ and `Code` text.  For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-You should test out updating your GitHub Pages website:
-
-* clone your group's blog project repo in RStudio
-* update "Your Project Title Here" to a new title in the YAML header
-* knit `index.Rmd` (we will now knit to HTML by default instead of pdf)
-* commit and push **both** `index.Rmd` and `index.html`
-* go to https://stat231-f21.github.io/blog_lokim/ to see the published test document (this is publicly available!)
-
-## Including code and plots
-
-You can embed code as normal, for example:
-
-```{r cars}
-summary(cars)
-```
-
-Let's clean up the format of that output instead of using the standard R output:
-
-```{r pretty-table, echo = TRUE}
-summary(cars) %>%
-  kable(col.names = c("Speed", "Distance"),
-        row.names = FALSE) %>%
-  kable_styling(bootstrap_options = "striped",
-                full_width = FALSE) %>%
-  row_spec(0, bold = TRUE) %>%
-  column_spec(1:2, width = "1.5in") 
-```
-
-In a study from the 1920s, fifty cars were used to see how the speed of the car and the distance taken to stop were related.  Speeds ranged between `r min(cars$speed)` and `r max(cars$speed)` mph.  Distances taken to stop ranged between `r min(cars$dist)` and `r max(cars$dist)` feet, with the middle 50% falling between `r as.numeric(quantile(cars$dist)[2])` and `r as.numeric(quantile(cars$dist)[4])` feet.  
-
-You can also embed plots as normal, for example:
-
-```{r figure1}
-ggplot(data = cars, aes(x = speed, y = dist)) + 
-  geom_point() + 
-  labs(x = "Speed of car (mph)",
-       y = "Distance taken to stop (ft)",
-       title = "Stopping distance increases with faster speeds",
-       subtitle = "Based on 1920s study") +
-  theme_classic()
-```
-
-Take note of the default code chunk options in the `setup` code chunk, and adjust individual code chunk options as needed. for example, unlike the rest of the Rmd files we worked in this semester, the default code chunk option is `echo = FALSE`, so you will need to set `echo  = TRUE` for any code chunks you would like to display in the blog. 
-
 
 ## Including links and images/videos
 
@@ -630,14 +576,7 @@ You can include [links](https://www.datadreaming.org/post/r-markdown-theme-galle
 knitr::include_graphics("https://media.giphy.com/media/H7ZrrA9V2pd3Tehdds/giphy.gif")
 ```
 
-## Including equations
 
-Equations may be needed if you are explaining a new technique or perhaps providing some other relevant formulas in your exposition. There are two ways to include equations:
-
-* Inline: $b \sim N(0, \sigma^2_b)$
-* Display-style (displayed on its own line): $$\frac{\sigma^2_b}{\sigma^2_b + \sigma^2_e}$$
-
-For typesetting equations appropriately, take a look at the *Symbols in math mode* section of this  [cheat sheet](https://users.dickinson.edu/~richesod/latex/latexcheatsheet.pdf)  (or do some extra Googling---there are *many* resources).
 
 
 

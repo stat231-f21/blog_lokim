@@ -177,6 +177,22 @@ treemap(data1,
 
 ```{r Geospatial Map}
 
+filtered_points <- all_listings  %>%
+  filter(locale == "New York") 
+
+map <- leaflet(filtered_points) %>%
+  addTiles() %>%
+  setView(median(filtered_points$longitude), median(filtered_points$latitude), zoom = 11) %>%
+  addCircles(~longitude, 
+             ~latitude, 
+             popup = filtered_points$listing_name,
+             weight = 1, 
+             radius=200,
+             color="blue", 
+             fillOpacity = 0.3)
+
+map
+#map
 ```
 
 

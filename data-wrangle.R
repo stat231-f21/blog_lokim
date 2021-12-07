@@ -203,4 +203,28 @@ host_data <- host_data[!duplicated(host_data$host_id), ]
 write_csv(host_data, "host_master.csv")
 
 
+###################################
+# Data Set Creation for Shiny App #
+###################################
+
+shiny_data <- all_properties %>%
+  select(listing_id,
+         listing_name,
+         listing_description,
+         locale,
+         latitude,
+         longitude,
+         bedrooms,
+         beds,
+         overall_rating,
+         price_per_night)
+
+shiny_data <- shiny_data %>%
+  filter(locale == "Hawaii")
+
+write_csv(shiny_data, "shiny_data.csv")
+
+
+
+
 
