@@ -50,7 +50,20 @@ all_hosts <- read_csv("host_master.csv")
 
 # **The Data**
 
-The data for this project was downloaded from a KAGGLE dataset. I found a 3rd party website, InsideAirbnb, that scrapes public Airbnb website data and provides downloadable csvs for datasets pertaining to locales around the world.
+To answer my questions about Airbnb, I needed a dataset that contains metrics beyond the sticker price of each airbnb property. Luckily, I found a website, [Inside Airbnb](http://insideairbnb.com/index.html) that provides airbnb datasets for cities across the world. Inside Airbnb periodically scrapes data from the Airbnb website to update their data for each city.
+
+## Getting / Picking Data
+
+
+
+## Wrangling
+
+
+
+
+[links](https://www.datadreaming.org/post/r-markdown-theme-gallery/)
+
+I found a 3rd party website, InsideAirbnb, that scrapes public Airbnb website data and provides downloadable csvs for datasets pertaining to locales around the world.
 
 I first identified that I wanted to focus on identifying trends within the United States; thus, I downloaded csv files for each of the 
 
@@ -60,7 +73,7 @@ I first identified that I wanted to focus on identifying trends within the Unite
 
 # **Describing and Naming Your Airbnb**
 
-**Purpose:** Part of being a successful Airbnb Host depends on your ability to persuade users to select your house over dozesn of similar options. Whether it be through fancy photos or a vast menu of amenities, hosts also seem to focus on utilizing key buzz words to grab Airbnb users' attention. 
+Part of being a successful Airbnb Host depends on your ability to persuade users to select your house over dozesn of similar options. Whether it be through fancy photos or a vast menu of amenities, hosts also seem to focus on utilizing key buzz words to grab Airbnb users' attention. 
 
 The following section utilizes the `wordcloud` package to generate graphics relating to the frequency in which Airbnb buzz words appear in listing descriptions and names. In addition, word frequency bar charts are also generated as another means of comparing the frequencies of the most popular words in Airbnb Listing names and descriptions.
 
@@ -99,7 +112,7 @@ A quick glance at the wordcloud shows that many of the words used for the Airbnb
 * Describe the physical location
 * Describe the type of property
 
-Many of the words serve as adjectives describing the house such as "charming", "Beautiful", "Gorgeous". In addition, we also seem to have many words that describe the type of property that host is advertising: "Apartment", "Oceanfront", "Modern", "Suite", "Studio".
+Many of the words serve as adjectives describing the house such as "charming", "Beautiful", "Gorgeous". In addition, we also seem to have many words that describe the type of property that the host is advertising: "Apartment", "Oceanfront", "Modern", "Suite", "Studio".
 
 ### Listing Description
 ```{r Listing Description Word Cloud, echo = FALSE, fig.width = 7, fig.height = 3.2, fig.align='left'}
@@ -122,7 +135,7 @@ A quick glance at the wordcloud shows that many of the words used for the Airbnb
 * Describe the physical location
 * Describe the type of property
 
-Many of the words serve as adjectives describing the house such as "charming", "Beautiful", "Gorgeous". In addition, we also seem to have many words that describe the type of property that host is advertising: "Apartment", "Oceanfront", "Modern", "Suite", "Studio".
+Many of the words serve as adjectives describing the house such as "charming", "Beautiful", "Gorgeous". In addition, we also seem to have many words that describe the type of property that the host is advertising: "Apartment", "Oceanfront", "Modern", "Suite", "Studio".
 
 ## **Word Barcharts** {.tabset .tabset-fade .tabset-pills}
 
@@ -177,26 +190,296 @@ The "Private" distinction may serve to be very important since Airbnb Hosts want
 
 # **Trends in Airbnb Hosts**
 
-**Purpose:** Lets consider the perspective of an Airbnb Host. What qualities of the Airbnb Hosts matter most in terms of generating high rates of bookings for their properties. 
-
 This section strives to identify key variables regarding Airbnb Hosts that ultimately drive their success. While exploring the dataset from InsideAirbnb, I found a vast array of variables that could be used to explore Airbnb Host qualities. These variables include:
+
 * `host_since`: Date when host joined
 * `host_response_proportion`: Proportion of booking messages that the Host responds too
 * `host_acceptance_proportion`: Proportion of booking requests that the Host accepts
-* 
+* `host_lisings_count_total`: Number of Listings Host owns
+
+Let's consider the perspective of an Airbnb Host. What qualities of the Airbnb Hosts matter most in terms of generating high rates of bookings for their properties (Acceptance Rate)? Is there a certain time in which a host should join? What external factors should the host consider? Should I get more Airbnb properties? 
+
+The following plots do not answer the questions above but attempt to add direction.
+
+
+## **When Should I Join?**
+
+**Host Joining Rates by Month**
+
+**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+
+```{r When Should I Join Prep, include = FALSE}
+# Create data frame with counts of hosts joining each month
+month_counts <- data.frame(table(all_hosts$month_host_joined))
+```
+
+```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create bar chart object
+month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
+  geom_col() + 
+  xlab("Month Joined") +
+  ylab("# of Hosts Joined") + 
+  ggtitle("# of Hosts Joined by Month") + 
+  theme(legend.position = "none")
+
+# Print bar chart
+month_bar
+```
+
+**Takeaways:** While the distribution is largely unimodal, it seems like there is an influx of hosts joining in the months of May through August. A possible explanation for this distribution could be attributed to the seasonality of Airbnb profitablity. It is possible that Airbnbs are largely booked in the summer do to better vacation conditions and warmer weather. With this in mind, Hosts would be inclined to join Airbnb in the same period in which booking is at its peak to seek immediate profit.  
+
+A further analysis of the seasonality of Airbnb hosts joining could include isolating the locations of the Airbnb hosts so that geographical effects are controlled for. 
+
+## **Consider the Housing Market?**
+
+**Hosts Joining Rates by Year**
+
+**Method:** The Time series for the Number of Hosts joined was constructed by grouping hosts by the year in which they joined (Truncating Day and Month from the `host_since` variable). 
+
+The Housing Index Time Series is a generalized plotting of the S&P Case-Shiller U.S. National Home Price Index. The Case-Shiller index measures the changes in the prices of single-family homes within the United States. The Housing Index $ values are the market closing index price on the last trading day of each year.
+
+```{r Yearly Join Prep, include = FALSE}
+# Read in necessary csvs
+index_housing <- read_csv("housing_index.csv")
+
+# Pull vars
+year_joined <- all_hosts %>%
+  select(host_since, id_host)
+
+# Reformat to just year
+year_joined$host_since <- format(year_joined$host_since,"%Y")
+
+# Count joiners for each year
+year_summary <- data.frame(table(year_joined$host_since)) %>%
+  rename("year" = Var1)
+
+# Prep housing index data
+index <- index_housing %>%
+  mutate(year = as.factor(date))
+
+combined <- merge(year_summary, index, by ="year") %>%
+  select(-date)
+
+coeff <- max(combined$value)/max(combined$Freq)
+```
+
+```{r Yearly Join Housing Index Plot, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create plot object
+host_since_plot <- ggplot(combined, aes(x = year, group = 1)) + 
+  geom_point(aes(y = Freq), col = "red") + 
+  geom_point(aes(y = value / coeff), col = "blue") +
+  scale_y_continuous(
+    name = "Number of Hosts Joined",
+    sec.axis = sec_axis(~.*coeff, name = "Housing Index $") 
+  ) + 
+  xlab("Year") +
+  theme(
+    axis.title.y = element_text(color = "red"),
+    axis.title.y.right = element_text(color = "blue")
+  ) + 
+  ggtitle("Host Joining & Case-Shiller U.S. National Home Price Index by Year")
+
+# Print plot object
+host_since_plot
+```
+
+**Takeaways:** I plotted the number of hosts joining each year against the Case-Shiller index to see if there were any signs of the housing market influencing airbnb hosts and prospective joiners. The double time series shows that as the Housing Index price increases sharply from 2017 on, the Number of Hosts joining decreases sharply. Maybe as the general price for homes increases, the number of prospective airbnb hosts decreases as the profitibality of home investing decreases. 
+
+## **Please Respond**
+
+**Acceptance Rate vs Response Rate**
+
+**Method:** All Percentage variables from the initial dataset were converted to decimals so that they could be used as continous variables. This was particularly important for scatterplots. The plot was created using `geom_hex` bins to represent the density of the points occuring in bin's region. I chose to use this over the typical scatter plot because points are scattered across the entire graph; therefore, the density of points would better represent any trends across the graph.
+
+```{r Acc Rate vs Resp Rate Prep, include = FALSE}
+# Pull needed vars
+hosts_scatter <- all_hosts %>%
+  select(id_host,
+         host_response_proportion,
+         host_acceptance_proportion,
+         locale,
+         host_listings_count_total) 
+```
+
+```{r Acc Rate vs Resp Rate Scatterplot, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create plot object
+acc_res_scatter <- ggplot(hosts_scatter, aes(x=host_response_proportion, y=host_acceptance_proportion)) +
+  geom_hex(bins = 20,alpha = 0.9) + 
+  scale_fill_gradient2(low="yellow",high="red") + 
+  xlab("Host Response Rate") + 
+  ylab("Host Acceptance Rate") + 
+  ggtitle("Acceptance Rate vs Response Rate") +
+  labs(fill = "# of Hosts")
+
+# Print Object
+acc_res_scatter
+```
+
+**Takeaways:** It is clear that the greatest number of hosts seem to have a Host response rate close to 1 and a Acceptance rate of 1. Does this indicate that "responsive" hosts are more likely to successfully accept a booking request? While we can see that hosts exhibit response rates and acceptance rates anywhere from 0 to 1, but the majority of hosts seem to have high acceptance and response rates. Prospective hosts may have to consider how responsive they have to be in order to increase the booking acceptance rates.
+
+## **Is More Better?**
+
+**Acceptance Rate vs Number of Listings**
+
+**Method:** Simple `ggplot` scatterplot with two continous variables: `host_acceptance_proportion` and `host_listings_count_total`
+
+```{r Acc Rate vs Listings Count Prep, include = FALSE}
+# Prep data frame: convert id_host to factor var
+hosts_scatter_b <- hosts_scatter %>%
+  mutate(host_id = as.factor(id_host))
+  filter(hosts_scatter, host_listings_count_total > 10)
+```
+
+```{r Acc Rate vs Listings Count Scatterplot, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create plot object
+acc_listings_scatter <- ggplot(hosts_scatter_b, aes(x=host_listings_count_total, y=host_acceptance_proportion)) +
+  geom_point(color = "Orange", alpha = 0.3) + 
+  xlab("Host Number of Listings") + 
+  ylab("Host Acceptance Rate") + 
+  ggtitle("Acceptance Rate vs Number of Listings")
+
+# Print Scatterplot
+acc_listings_scatter
+```
+
+**Takeaways:** While there is no clear linear trend, it seems that as the number of listings a host owns increases, the host acceptance rate also increases at a decreasing rate. In other words, the relationship could be seen as logarithmic. An explanation of this phenomena? Hosts that have more listings may be more responsible and thus will be most likely to close on a booking request.
 
 
 
 
-## **
 
 
 
 
 # **Trends in Airbnb Listings**
 
+This section strives to identify key variables regarding Airbnb Hosts that ultimately drive their success. While exploring the dataset from InsideAirbnb, I found a vast array of variables that could be used to explore Airbnb Host qualities. These variables include:
 
-# **Conclusions**
+* `host_since`: Date when host joined
+* `host_response_proportion`: Proportion of booking messages that the Host responds too
+* `host_acceptance_proportion`: Proportion of booking requests that the Host accepts
+* `host_lisings_count_total`: Number of Listings Host owns
+
+Let's consider the perspective of an Airbnb Host. What qualities of the Airbnb Hosts matter most in terms of generating high rates of bookings for their properties (Acceptance Rate)? Is there a certain time in which a host should join? What external factors should the host consider? Should I get more Airbnb properties? 
+
+The following plots do not answer the questions above but attempt to add direction.
+
+
+## **Strive for Reviews**
+
+**Ratings vs Reviews**
+
+**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+
+```{r When Should I Join Prep, include = FALSE}
+# Create data frame with counts of hosts joining each month
+month_counts <- data.frame(table(all_hosts$month_host_joined))
+```
+
+```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create bar chart object
+month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
+  geom_col() + 
+  xlab("Month Joined") +
+  ylab("# of Hosts Joined") + 
+  ggtitle("# of Hosts Joined by Month") + 
+  theme(legend.position = "none")
+
+# Print bar chart
+month_bar
+```
+
+**Takeaways:** asdf adsfs sdf sdf 
+
+## **Where Should I Go?**
+
+**Ratings vs Reviews**
+
+**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+
+```{r When Should I Join Prep, include = FALSE}
+# Create data frame with counts of hosts joining each month
+month_counts <- data.frame(table(all_hosts$month_host_joined))
+```
+
+```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create bar chart object
+month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
+  geom_col() + 
+  xlab("Month Joined") +
+  ylab("# of Hosts Joined") + 
+  ggtitle("# of Hosts Joined by Month") + 
+  theme(legend.position = "none")
+
+# Print bar chart
+month_bar
+```
+
+**Takeaways:** asdf adsfs sdf sdf 
+
+## **What Kind of Property?**
+
+**Ratings vs Reviews**
+
+**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+
+```{r When Should I Join Prep, include = FALSE}
+# Create data frame with counts of hosts joining each month
+month_counts <- data.frame(table(all_hosts$month_host_joined))
+```
+
+```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create bar chart object
+month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
+  geom_col() + 
+  xlab("Month Joined") +
+  ylab("# of Hosts Joined") + 
+  ggtitle("# of Hosts Joined by Month") + 
+  theme(legend.position = "none")
+
+# Print bar chart
+month_bar
+```
+
+**Takeaways:** asdf adsfs sdf sdf
+
+## **Super Cool Heat Map?**
+
+**Super Cool Heat Map**
+
+**Method:** The downloaded csvs from InsideAirbnb included the `host_since` variable which was later manipulated to truncate the day and year of the supplied Date, `month_host_joined`. The barchart was created with `ggplot`.
+
+```{r When Should I Join Prep, include = FALSE}
+# Create data frame with counts of hosts joining each month
+month_counts <- data.frame(table(all_hosts$month_host_joined))
+```
+
+```{r Month_Joined Barchart, echo = FALSE, fig.align='left', fig.width = 7.5, fig.height = 3.5}
+# Create bar chart object
+month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
+  geom_col() + 
+  xlab("Month Joined") +
+  ylab("# of Hosts Joined") + 
+  ggtitle("# of Hosts Joined by Month") + 
+  theme(legend.position = "none")
+
+# Print bar chart
+month_bar
+```
+
+**Takeaways:** asdf adsfs sdf sdf
+
+
+
+
+
+
+
+
+
+
+
+# **Looking Forward**
 
 
 

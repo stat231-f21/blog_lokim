@@ -81,14 +81,6 @@ month_bar <- ggplot(data = month_counts, aes(x=Var1, y=Freq, fill = Var1)) +
 month_bar
 ```
 
-```{r host_since RETRY}
-host_since_data <- all_hosts %>%
-  select(host_since, id_host)
-
-
-```
-
-
 ```{r host_since plot monthly Seasonality}
 # Pull Vars
 joined_since <- all_hosts %>%
@@ -105,14 +97,14 @@ joined_summary <- data.frame(table(joined_since$host_since))
    mutate(date = as.Date(Var1, format = "%m/%Y"))
 
 # Create plot 
-host_since_plot <- ggplot(joined_summary, aes(x = as.numeric(Var1), y = Freq)) + 
-  geom_line(col = "red") + 
+joined_time <- ggplot(joined_summary, aes(x = Var1, y = Freq, group = 1)) + 
+  geom_point(stat='summary', fun.y=sum) + 
+  stat_summary(fun = sum, geom = "line") +
   xlab("Date Joined") + 
-  ylab("# of Hosts Joined ") + 
-  ggtitle("# of Hosts Joined over Time")
+  ylab("# of Hosts Joined ") 
 
 # Print plot
-host_since_plot
+joined_time
 ```
 
 
@@ -137,13 +129,14 @@ combined <- merge(year_summary, index, by ="year") %>%
 
 coeff <- max(combined$value)/max(combined$Freq)
 
-host_since_plot <- ggplot(combined, aes(x = as.numeric(year))) + 
-  geom_line(aes(y = Freq), col = "red") + 
-  geom_line(aes(y = value / coeff),col = "blue") + 
+host_since_plot <- ggplot(combined, aes(x = year, group = 1)) + 
+  geom_point(aes(y = Freq), col = "red") + 
+  geom_point(aes(y = value / coeff), col = "blue") +
   scale_y_continuous(
-    name = "Number of people joined",
+    name = "Number of Hosts Joined",
     sec.axis = sec_axis(~.*coeff, name = "Housing Index $") 
-  )
+  ) + 
+  xlab("Year")
 
 host_since_plot
 ```
