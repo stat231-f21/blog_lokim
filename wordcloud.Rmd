@@ -26,7 +26,6 @@ all_hosts <- read_csv("host_master.csv")
 ```
 
 ```{r Wordcloud Description} 
-#https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
 #prep data frame
 listing_desc <- all_listings %>%
   select(listing_description)
@@ -38,14 +37,14 @@ listing_desc
 #create corpus
 corp <- Corpus(VectorSource(listing_desc))
 
-
+# Citation: https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
 #clean corpus
 corp <- corp %>%
   tm_map(removeNumbers) %>%
   tm_map(removePunctuation) %>%
   tm_map(stripWhitespace)
 corp <- tm_map(corp, content_transformer(tolower))
-corp <- tm_map(corp, removeWords, stopwords("english"))
+corp <- tm_map(corp, removeWords, c(stopwords("english"), "spacebbr", "bthe", "will"))
 
 #create doccument matrix for wordcloud
 dtm <- TermDocumentMatrix(corp)
@@ -126,16 +125,3 @@ name_bar <- ggplot(data = name_freq, aes(x=reorder(word, freq), y=freq, fill = w
 # Print plot
 name_bar
 ```
-
-
-
-```{r testing}
-data(stop_words)
-```
-
-
-
-
-
-
-

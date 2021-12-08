@@ -4,6 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+# Load Packages
 library(tidyverse)
 library(janitor)
 library(lubridate)
@@ -22,7 +23,6 @@ all_listings <- read_csv("airbnb_master.csv")
 all_hosts <- read_csv("host_master.csv")
 index_housing <- read_csv("housing_index.csv")
 ```
-
 
 ```{r scatter acceptance_rate vs response_rate}
 # Pull needed vars
@@ -46,7 +46,6 @@ acc_res_scatter <- ggplot(hosts_scatter, aes(x=host_response_proportion, y=host_
 acc_res_scatter
 ```
 
-
 ```{r scatter acceptance_rate vs listings_count}
 # Prep data frame: convert id_host to factor var
 hosts_scatter_b <- hosts_scatter %>%
@@ -63,7 +62,6 @@ acc_listings_scatter <- ggplot(hosts_scatter_b, aes(x=host_listings_count_total,
 # Print Scatterplot
 acc_listings_scatter
 ```
-
 
 ```{r bar graph monthly counts}
 # Create data frame with counts of hosts joining each month
@@ -107,7 +105,6 @@ joined_time <- ggplot(joined_summary, aes(x = Var1, y = Freq, group = 1)) +
 joined_time
 ```
 
-
 ```{r host_since plot. Date vs join count}
 # Pull vars
 year_joined <- all_hosts %>%
@@ -140,30 +137,3 @@ host_since_plot <- ggplot(combined, aes(x = year, group = 1)) +
 
 host_since_plot
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

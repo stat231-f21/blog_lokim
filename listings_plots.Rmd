@@ -211,7 +211,6 @@ treemap(data1,
 ```
 
 ```{r Geospatial Map Prototype}
-
 # Filter Points
 filtered_points <- all_listings  %>%
   filter(locale == "New York") 

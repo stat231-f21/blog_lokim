@@ -2,6 +2,7 @@
 # Packages #
 ############
 
+#Load  Packages
 library(tidyverse)
 library(kableExtra)
 library(robotstxt) 
@@ -207,6 +208,7 @@ write_csv(host_data, "host_master.csv")
 # Data Set Creation for Shiny App #
 ###################################
 
+# Pull needed vars
 shiny_data <- all_properties %>%
   select(listing_id,
          listing_name,
@@ -219,9 +221,7 @@ shiny_data <- all_properties %>%
          overall_rating,
          price_per_night)
 
-shiny_data <- shiny_data %>%
-  filter(locale == "Hawaii")
-
+# Write to csv
 write_csv(shiny_data, "shiny_data.csv")
 
 

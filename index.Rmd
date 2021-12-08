@@ -256,7 +256,7 @@ A further analysis of the seasonality of Airbnb hosts joining could include isol
 
 **Method:** The Time series for the Number of Hosts joined was constructed by grouping hosts by the year in which they joined (Truncating Day and Month from the `host_since` variable). 
 
-The Housing Index Time Series is a generalized plotting of the S&P Case-Shiller U.S. National Home Price Index. The Case-Shiller index measures the changes in the prices of single-family homes within the United States. The Housing Index $ values are the market closing index price on the last trading day of each year.
+The Housing Index Time Series is a generalized plotting of the [S&P Case-Shiller U.S. National Home Price Index](https://fred.stlouisfed.org/series/CSUSHPINSA). The Case-Shiller index measures the changes in the prices of single-family homes within the United States. The Housing Index $ values are the market closing index price on the last trading day of each year.
 
 ```{r Yearly Join Prep, include = FALSE}
 # Read in necessary csvs
