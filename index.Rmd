@@ -9,6 +9,7 @@ output:
 ---
 
 ```{r setup, include = FALSE}
+# Load needed Packages
 library(tidyverse)
 library(kableExtra)
 library(robotstxt) 
@@ -550,31 +551,18 @@ In contrast, it seems like vacation locales like Hawaii, San Diego, have a small
 
 **Method:** The map object was created with the `leaflet` package. Leaflet allows users to easily generate maps by inputing a set of coordinates. Although leaflet is not compatible with ggmap (I think), I used the `addCircleMarkers` method to add points using the longitude/latitude coordinates provided for each listing in my dataset. 
 
-```{r Shiny Map, out.extra="data-external=1", fig.height = 7, fig.width = 7.5, out.width = "100%"}
+```{r Shiny Map, out.extra="data-external=1", fig.height = 4, fig.width = 7.5, out.width = "100%"}
 # Embed shiny app
 knitr::include_app("https://lokim21.shinyapps.io/mapShinyApp/", 
                    height = "700px")
 ```
 
+
 **Takeaways:** The leaflet map allows users to see where listings are highly concentrated. By visualizing the density of airbnb listings in certain areas of a locale, potential hosts can select the type of market they want to enter: a) more urban setting with lots of competing hosts. b) Less competitive area where airbnb listings are more spread out.
 
-
-# Header 1 (Section heading)
-
-## Including links and images/videos
-
-You can include [links](https://www.datadreaming.org/post/r-markdown-theme-gallery/) and there are a few ways to embed  images! Both options for embedding images below can be used interchangeably. They both work for png, pdf, jpg, and even gif formats, and both support filepaths that are either URLs (for videos, you can include links to any valid YouTube or Vimeo URLs; see [here](https://bookdown.org/yihui/rmarkdown/learnr-videos.html) for more details) or point to a location within your project directory. 
-
-### Option 1: Markdown approach
-
-![This is a figure caption. The artwork is called Safe Space by  [Kenesha Sneed](https://www.keneshasneed.com/#/safespace/)](img/Kenesha-Sneed_safe-space.jpeg)
+# **Looking Forward**
 
 
-### Option 2: Code chunk approach
-
-```{r, fig.cap = "This is also figure caption"}
-knitr::include_graphics("https://media.giphy.com/media/H7ZrrA9V2pd3Tehdds/giphy.gif")
-```
 
 
 

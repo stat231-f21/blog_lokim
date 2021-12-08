@@ -4,6 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+# Load Packages
 library(tidyverse)
 library(janitor)
 library(lubridate)
@@ -17,27 +18,29 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r import-data}
+# Load Data
 all_listings <- read_csv("airbnb_master.csv")
 all_hosts <- read_csv("host_master.csv")
 ```
 
-
 ```{r Rating vs RPM Scatter}
+# Pull Vars
 listing_scatter <- all_listings %>%
   select(listing_id,
          overall_rating,
          reviews_per_month,
          locale)
 
+# Create Plot object
 rating_rpm <- ggplot(listing_scatter, aes(x = reviews_per_month, y = overall_rating)) + 
   geom_point(col = "red", alpha = 0.2) + 
   xlab("Reviews Per Month") + 
   ylab("Overall Rating out of 5") + 
   ggtitle("Rating vs Reviews Per Month")
 
+# Print plot
 rating_rpm
 ```
-
 
 ```{r Violin plot of prices grouped by locale}
 # Grab Data only needed for violin plot
@@ -69,8 +72,7 @@ violin_plot <- ggplot(no_outliers, aes(x=reorder(locale, price_per_night), y=pri
 violin_plot
 ```
 
-
-```{r Treemap Roomtype}
+```{r Treemap Prototype}
 # Pull relevant vars
 roomtype_counts <- all_listings %>%
   select(locale,
@@ -113,9 +115,23 @@ roomtype_map <- treemap(roomtype_counts,
 # Print Tree map
 roomtype_map
 ```
+
 ```{r TREEMAP}
-group = c(rep("Austin",4),rep("Boston",4),rep("Chicago",4),rep("Denver",4),rep("Hawaii",4),rep("Los Angeles",4),rep("Nashville",4),
-           rep("New Orleans",4),rep("New York",4),rep("San Diego",4),rep("San Francisco",4),rep("Seattle",4))
+# Create groups for Treemap
+group = c(rep("Austin",4),
+          rep("Boston",4),
+          rep("Chicago",4),
+          rep("Denver",4),
+          rep("Hawaii",4),
+          rep("Los Angeles",4),
+          rep("Nashville",4),
+          rep("New Orleans",4),
+          rep("New York",4),
+          rep("San Diego",4),
+          rep("San Francisco",4),
+          rep("Seattle",4))
+
+# Create subgroup
 subgroup <- c("Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
@@ -128,6 +144,8 @@ subgroup <- c("Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room")
+
+# Initialize counts for each Locale/Subgroup
 value = c(4295,6,683,60,
             806,16,553,5,
             2731,33,1060,54,
@@ -140,7 +158,11 @@ value = c(4295,6,683,60,
             5350,7,1037,55,
             2061,44,1076,58,
             2086,453,16,0)
+
+# Create dataframe for Treemap
 data = data.frame(group,subgroup,value)
+
+# Create Treemap
 treemap(data,
         index = c("group","subgroup"),
         vSize = "value",
@@ -148,24 +170,37 @@ treemap(data,
         border.col = c("black","white"),
         border.lwds = c(7,2),
         overlap.labels = 1)
-
 ```
 
 ```{r treemap 2}
-group1 = c(rep("Austin",4),rep("Boston",4),rep("Chicago",4),rep("Denver",4),rep("Hawaii",4),rep("Los Angeles",4))
+# Create groups
+group1 = c(rep("Austin",4),
+           rep("Boston",4),
+           rep("Chicago",4),
+           rep("Denver",4),
+           rep("Hawaii",4),
+           rep("Los Angeles",4))
+
+# Create subgroups
 subgroup1 <- c("Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room",
               "Entire home/apt","Hotel room","Private room","Shared room")
+
+# Create values for groups/subgroups
 value1 = c(4295,6,683,60,
             806,16,553,5,
             2731,33,1060,54,
             1965,8,403,12,
             12662,70,1128,22,
             10120,66,3785,248)
+
+# Push into dataframe
 data1 = data.frame(group1,subgroup1,value1)
+
+# Create Treemap
 treemap(data1,
         index = c("group1","subgroup1"),
         vSize = "value1",
@@ -175,11 +210,13 @@ treemap(data1,
         overlap.labels = 1)
 ```
 
-```{r Geospatial Map}
+```{r Geospatial Map Prototype}
 
+# Filter Points
 filtered_points <- all_listings  %>%
   filter(locale == "New York") 
 
+# Create map object
 map <- leaflet(filtered_points) %>%
   addTiles() %>%
   setView(median(filtered_points$longitude), median(filtered_points$latitude), zoom = 11) %>%
@@ -190,34 +227,4 @@ map <- leaflet(filtered_points) %>%
              radius=200,
              color="blue", 
              fillOpacity = 0.3)
-
-map
-#map
 ```
-
-
-```{r heat-map}
-austin_map <- all_listings %>%
-  filter(locale == "Austin") 
-
-# Configure Map
-map_bounds <- c(left = min(austin_map$longitude),
-                right = max(austin_map$longitude), 
-                bottom = min(austin_map$latitude), 
-                top = max(austin_map$latitude))
-austin <- get_stamenmap(map_bounds, zoom = 12, maptype = "toner-lite")
-
-austin<- ggmap(austin, extent="device", legend="none")
-austin <- austin + stat_density2d(data=austin_map,  aes(x=longitude, y=latitude, fill=..level.., alpha=..level..), geom="polygon")
-austin <- austin +scale_fill_gradientn(colours=rev(brewer.pal(7, "Spectral")))
-
-austin
-```
-
-
-
-
-
-
-
-

@@ -4,6 +4,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+# Load Packages
 library(tidyverse)
 library(janitor)
 library(lubridate)
@@ -19,10 +20,10 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r import-data}
+# Load Data
 all_listings <- read_csv("airbnb_master.csv")
 all_hosts <- read_csv("host_master.csv")
 ```
-
 
 ```{r Wordcloud Description} 
 #https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
@@ -75,7 +76,6 @@ desc_bar <- ggplot(data = desc_freq, aes(x=reorder(word, freq), y=freq, fill = w
 desc_bar
 ```
 
-
 ```{r Wordcloud Name} 
 #https://towardsdatascience.com/create-a-word-cloud-with-r-bde3e7422e8a
 #prep data frame
@@ -113,7 +113,6 @@ set.seed(53)
 wordcloud(words = df_name$word, freq = df_name$freq, min.freq = 1, max.words=70, random.order=FALSE, rot.per=0.3,            colors=brewer.pal(8, "Dark2"))
 ```
 
-
 ```{r Name Barchart}
 # Wrangling for bar chart frequency plot
 name_freq <- df_name[order(-df_name$freq),] %>%
@@ -130,7 +129,9 @@ name_bar
 
 
 
-
+```{r testing}
+data(stop_words)
+```
 
 
 
