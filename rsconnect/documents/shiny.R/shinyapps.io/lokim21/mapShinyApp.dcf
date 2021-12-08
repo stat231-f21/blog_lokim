@@ -1,0 +1,14 @@
+name: mapShinyApp
+title: mapShinyApp
+username:
+account: lokim21
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5284858
+bundleId: 5346055
+url: https://lokim21.shinyapps.io/mapShinyApp/
+when: 1638979634.96929
+lastSyncTime: 1638979634.96931
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: airbnb_master.csv|data-wrangle.R|description_words.csv|host_master.csv|host_plots.Rmd|housing_index.csv|img/Kenesha-Sneed_safe-space.jpeg|index.html|index.Rmd|Kenesha-Sneed_safe-space.jpeg|listings_plots.Rmd|name_words.csv|plots.Rmd|README.md|wordcloud.Rmd|airbnb_raw_data
